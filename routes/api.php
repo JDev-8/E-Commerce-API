@@ -1,8 +1,10 @@
 <?php
 
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\CarritoController;
 use App\Http\Controllers\ProductoController;
 use App\Http\Controllers\CategoriaController;
+use App\Http\Controllers\OrdenController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -28,4 +30,12 @@ Route::middleware('auth:sanctum')->group(function (){
   Route::post('/categorias', [CategoriaController::class, 'store']);
   Route::put('/categorias/{id}', [CategoriaController::class, 'update']);
   Route::delete('/categorias/{id}', [CategoriaController::class, 'destroy']);
+
+  Route::get('/carrito', [CarritoController::class, 'index']);
+  Route::post('/carrito', [CarritoController::class, 'store']);
+  Route::delete('/carrito/{id}', [CarritoController::class, 'destroy']);
+
+  Route::post('/checkout', [OrdenController::class, 'checkout']);
+  Route::post('/checkout/confirm', [OrdenController::class, 'confirmarPago']);
+  Route::get('/mis-ordenes', [OrdenController::class, 'misOrdenes']);
 });

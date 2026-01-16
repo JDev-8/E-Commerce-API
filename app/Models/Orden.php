@@ -21,7 +21,11 @@ class Orden extends Model
       return $this->hasMany(Usuario::class);
     }
 
-    public function orden_item(){
-      return $this->belongsTo(Usuario::class);
+    public function items(){
+      return $this->hasMany(Orden_item::class, 'orden_id');
+    }
+
+    public function pago(){
+      return $this->hasOne(Pago::class, 'orden_id');
     }
 }

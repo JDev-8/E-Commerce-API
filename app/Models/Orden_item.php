@@ -18,11 +18,7 @@ class Orden_item extends Model
       'pago_momento'
     ];
 
-    public function orden(){
-      return $this->hasMany(Orden::class);
-    }
-
     public function producto(){
-      return $this->hasMany(Producto::class);
+      return $this->belongsTo(Producto::class, 'producto_id');
     }
 }
