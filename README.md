@@ -4,35 +4,34 @@ API robusta y escalable para una plataforma de comercio electrónico, desarrolla
 
 ## 🚀 Características Principales
 
--   **Autenticación Segura**: Sistema de Login/Registro utilizando Laravel Sanctum (Tokens JWT).
+- **Autenticación Segura**: Sistema de Login/Registro utilizando Laravel Sanctum (Tokens JWT).
 
--   **Roles y Permisos**: Middleware personalizado para separar lógica de Clientes y Administradores.
+- **Roles y Permisos**: Middleware personalizado para separar lógica de Clientes y Administradores.
 
--   **Gestión de Catálogo**: CRUD completo para Productos y Categorías con validación de datos.
+- **Gestión de Catálogo**: CRUD completo para Productos y Categorías con validación de datos.
 
--   **Carrito de Compras Persistente**: Lógica de negocio para manejar stock en tiempo real y persistencia en base de datos.
+- **Carrito de Compras Persistente**: Lógica de negocio para manejar stock en tiempo real y persistencia en base de datos.
 
--   **Pasarela de Pagos (Stripe)**:
+- **Pasarela de Pagos (Stripe)**:
+    - Generación de intentos de pago (Payment Intents).
 
-    -   Generación de intentos de pago (Payment Intents).
+    - Confirmación segura desde el backend.
 
-    -   Confirmación segura desde el backend.
+    - Manejo de transacciones atómicas (`DB::transaction`) para asegurar la integridad de datos.
 
-    -   Manejo de transacciones atómicas (`DB::transaction`) para asegurar la integridad de datos.
-
--   **Historial de Órdenes**: Registro detallado de pedidos y estados (Pendiente, Pagado).
+- **Historial de Órdenes**: Registro detallado de pedidos y estados (Pendiente, Pagado).
 
 ## 🛠️ Stack Tecnológico
 
--   **Lenguaje**: PHP 8.2
+- **Lenguaje**: PHP 8.2
 
--   **Framework**: Laravel 11
+- **Framework**: Laravel 11
 
--   **Base de Datos**: PostgreSQL
+- **Base de Datos**: PostgreSQL
 
--   **Pagos**: Stripe SDK
+- **Pagos**: Stripe SDK
 
--   **Herramientas**: Insomnia/Postman, Composer, Git.
+- **Herramientas**: Insomnia/Postman, Composer, Git.
 
 ## 🗄️ Modelo de Base de Datos
 
@@ -169,9 +168,19 @@ La API estará disponible en http://127.0.0.1:8000.
 | DELETE | `/api/productos/{id}` | Eliminar producto   |
 | POST   | `/api/categorias`     | Crear categoría     |
 
-## 🧪 Testing
+## 🧪 Testing y CI/CD
 
-Para probar la API, se recomienda usar Insomnia o Postman.
-Recuerda enviar el Header `Accept: application/json` en todas las peticiones.
+![Laravel Tests](https://github.com/JDev-8/E-Commerce-API/actions/workflows/laravel.yml/badge.svg)
+
+El proyecto cuenta con pruebas automatizadas (PHPUnit) integradas en GitHub Actions.
+
+Para ejecutar las pruebas localmente:
+
+```
+php artisan test
+
+```
+
+Recuerda enviar el Header `Accept: application/json` en todas las peticiones si usas Insomnia o Postman.
 
 Desarrollado con ❤️ para el portafolio de Backend Developer.
