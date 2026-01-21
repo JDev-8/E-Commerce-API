@@ -21,6 +21,7 @@ class RegisterRequest extends FormRequest
             'correo_electronico' => 'required|string|email|unique:usuarios,correo_electronico',
             'telefono' => 'required|string|unique:usuarios,telefono',
             'contrasenia' => 'required|string|min:8',
+            'is_admin' => 'required',
         ];
     }
 
@@ -43,6 +44,7 @@ class RegisterRequest extends FormRequest
             'telefono.unique'   => 'Este número de teléfono ya está registrado.',
             'contrasenia.required' => 'La contraseña es obligatoria.',
             'contrasenia.min'      => 'La contraseña debe tener al menos 8 caracteres.',
+            'is_admin.required'      => 'Este registro es obligatorio.',
         ];
     }
 }

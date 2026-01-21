@@ -29,6 +29,11 @@ class Usuario extends Authenticatable
         'remember_token',
     ];
 
+    protected $casts = [
+        'is_admin' => 'boolean',
+        'email_verified_at' => 'datetime',
+    ];
+
     public function getAuthPassword()
     {
       return $this->contrasenia;

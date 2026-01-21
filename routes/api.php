@@ -22,14 +22,16 @@ Route::middleware('auth:sanctum')->group(function (){
   Route::get('/user', function (Request $request) {
     return $request->user();
     });
+
+    Route::middleware('admin')->group(function () {
+         Route::post('/productos', [ProductoController::class, 'store']);
+          Route::put('/productos/{id}', [ProductoController::class, 'update']);
+          Route::delete('/productos/{id}', [ProductoController::class, 'destroy']);
   
-  Route::post('/productos', [ProductoController::class, 'store']);
-  Route::put('/productos/{id}', [ProductoController::class, 'update']);
-  Route::delete('/productos/{id}', [ProductoController::class, 'destroy']);
-  
-  Route::post('/categorias', [CategoriaController::class, 'store']);
-  Route::put('/categorias/{id}', [CategoriaController::class, 'update']);
-  Route::delete('/categorias/{id}', [CategoriaController::class, 'destroy']);
+          Route::post('/categorias', [CategoriaController::class, 'store']);
+          Route::put('/categorias/{id}', [CategoriaController::class, 'update']);
+          Route::delete('/categorias/{id}', [CategoriaController::class, 'destroy']);
+    });
 
   Route::get('/carrito', [CarritoController::class, 'index']);
   Route::post('/carrito', [CarritoController::class, 'store']);

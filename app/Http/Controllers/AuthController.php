@@ -12,7 +12,7 @@ class AuthController extends Controller
 {
     public function register(RegisterRequest $request)
     {
-      $usuario = Usuario::create($request->validate());
+      $usuario = Usuario::create($request->validated());
 
       $token = $usuario->createToken('auth_token')->plainTextToken;
 
