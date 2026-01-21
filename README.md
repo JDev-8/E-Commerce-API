@@ -1,59 +1,177 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# 🛒 API E-commerce Profesional
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+API robusta y escalable para una plataforma de comercio electrónico, desarrollada con **Laravel** y **PostgreSQL**. Este proyecto implementa un flujo de compra completo, desde la gestión de inventario hasta el procesamiento de pagos reales con **Stripe**.
 
-## About Laravel
+## 🚀 Características Principales
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+-   **Autenticación Segura**: Sistema de Login/Registro utilizando Laravel Sanctum (Tokens JWT).
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+-   **Roles y Permisos**: Middleware personalizado para separar lógica de Clientes y Administradores.
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+-   **Gestión de Catálogo**: CRUD completo para Productos y Categorías con validación de datos.
 
-## Learning Laravel
+-   **Carrito de Compras Persistente**: Lógica de negocio para manejar stock en tiempo real y persistencia en base de datos.
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework. You can also check out [Laravel Learn](https://laravel.com/learn), where you will be guided through building a modern Laravel application.
+-   **Pasarela de Pagos (Stripe)**:
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+    -   Generación de intentos de pago (Payment Intents).
 
-## Laravel Sponsors
+    -   Confirmación segura desde el backend.
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+    -   Manejo de transacciones atómicas (`DB::transaction`) para asegurar la integridad de datos.
 
-### Premium Partners
+-   **Historial de Órdenes**: Registro detallado de pedidos y estados (Pendiente, Pagado).
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+## 🛠️ Stack Tecnológico
 
-## Contributing
+-   **Lenguaje**: PHP 8.2
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+-   **Framework**: Laravel 11
 
-## Code of Conduct
+-   **Base de Datos**: PostgreSQL
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+-   **Pagos**: Stripe SDK
 
-## Security Vulnerabilities
+-   **Herramientas**: Insomnia/Postman, Composer, Git.
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+## 🗄️ Modelo de Base de Datos
 
-## License
+El sistema utiliza una arquitectura relacional normalizada.
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+```sql
+  USUARIOS {
+    bigint id
+    string nombre_usuario
+    string correo_electronico
+    string password
+    boolean is_admin
+    }
+    PRODUCTOS {
+        bigint id
+        string nombre
+        integer precio
+        integer stock
+        string slug
+    }
+    ORDENES {
+        bigint id
+        string estado
+        integer pago_total
+    }
+```
+
+## ⚙️ Instalación y Configuración
+
+Sigue estos pasos para desplegar el proyecto en tu entorno local:
+
+### 1. Clonar el Repositorio
+
+```
+git clone [https://github.com/JDev-8/E-Commerce-API.git](https://github.com/JDev-8/E-Commerce-API.git)
+cd E-Commerce-API
+
+```
+
+### 2. Instalar Dependencias
+
+```
+composer install
+
+```
+
+## 3. Configurar Entorno
+
+Copia el archivo de ejemplo y genera la llave de aplicación.
+
+```
+cp .env.example .env
+php artisan key:generate
+
+```
+
+## 4. Configurar Base de Datos
+
+Abre el archivo .env y configura tus credenciales de PostgreSQL:
+
+```
+DB_CONNECTION=pgsql
+DB_HOST=127.0.0.1
+DB_PORT=5432
+DB_DATABASE=api_ecommerce
+DB_USERNAME=postgres
+DB_PASSWORD=tu_password
+
+```
+
+## 5. Configurar Stripe
+
+Agrega tus llaves de prueba de Stripe en el .env (Obtenlas en dashboard.stripe.com):
+
+```
+STRIPE_KEY=pk_test_...
+STRIPE_SECRET=sk_test_...
+```
+
+## 6. Migrar Base de Datos
+
+```
+php artisan migrate
+```
+
+## 7. Ejecutar Servidor
+
+```
+php artisan serve
+```
+
+La API estará disponible en http://127.0.0.1:8000.
+
+## 📡 Documentación de Endpoints
+
+### 🔐 Autenticación
+
+| Método | Endpoint        | Descripción                           |
+| :----- | :-------------- | :------------------------------------ |
+| POST   | `/api/register` | Crear cuenta nueva                    |
+| POST   | `/api/login`    | Iniciar sesión (Retorna Token Bearer) |
+| POST   | `/api/logout`   | Cerrar sesión                         |
+
+### 📦 Productos (Público)
+
+| Método | Endpoint              | Descripción             |
+| :----- | :-------------------- | :---------------------- |
+| GET    | `/api/productos`      | Listar productos        |
+| GET    | `/api/productos/{id}` | Ver detalle de producto |
+| GET    | `/api/categorias`     | Listar categorías       |
+
+### 🛒 Carrito de Compras (Requiere Auth)
+
+| Método | Endpoint                | Descripción                              |
+| :----- | :---------------------- | :--------------------------------------- |
+| GET    | `/api/carrito`          | Ver mi carrito                           |
+| POST   | `/api/carrito`          | Agregar item (`producto_id`, `cantidad`) |
+| DELETE | `/api/carrito/{itemId}` | Quitar item del carrito                  |
+
+### 💳 Checkout y Órdenes (Requiere Auth)
+
+| Método | Endpoint                | Descripción                                              |
+| :----- | :---------------------- | :------------------------------------------------------- |
+| POST   | `/api/checkout`         | Iniciar pago (Retorna `clientSecret` y `IntentoPagarId`) |
+| POST   | `/api/checkout/confirm` | Confirmar pago (`payment_intent_id`)                     |
+| GET    | `/api/mis-ordenes`      | Ver historial de compras                                 |
+
+### 🛡️ Administración (Requiere is_admin=true)
+
+| Método | Endpoint              | Descripción         |
+| :----- | :-------------------- | :------------------ |
+| POST   | `/api/productos`      | Crear producto      |
+| PUT    | `/api/productos/{id}` | Actualizar producto |
+| DELETE | `/api/productos/{id}` | Eliminar producto   |
+| POST   | `/api/categorias`     | Crear categoría     |
+
+## 🧪 Testing
+
+Para probar la API, se recomienda usar Insomnia o Postman.
+Recuerda enviar el Header `Accept: application/json` en todas las peticiones.
+
+Desarrollado con ❤️ para el portafolio de Backend Developer.

@@ -20,14 +20,14 @@ class OrdenController extends Controller
 
         $carrito = Carrito::where('usuario_id', $usuario->id)->with('items.producto')->first();
 
-        if(!$carrito || $carrito->items()->isEmpty()) return response()->json(['mensaje' => 'El carrito está vacío'], 400);
+        if(!$carrito || $carrito->items->isEmpty()) return response()->json(['mensaje' => 'El carrito está vacío'], 400);
 
         $totalPagar = 0;
 
         foreach($carrito->items as $item){
           if($item->producto->stock < $item->cantidad) return response()->json(['mensaje' => "Stock insuficiente para el producto: {$item->product->nombre}"], 400);
            
-          $totalPagar += $item->product->precio * $item->cantidad;
+          $totalPagar += $item->producto->precio * $item->cantidad;
         }
 
         Stripe::setApiKey(env('STRIPE_SECRET'));
@@ -36,6 +36,7 @@ class OrdenController extends Controller
           $intentoPagar = PaymentIntent::create([
             'amount' => $totalPagar,
             'currency' => 'usd',
+            'payment_method_types' => ['card'],
             'metadata' => ['user_id' => $usuario->id]
           ]);
 
@@ -52,13 +53,13 @@ class OrdenController extends Controller
     public function confirmarPago(Request $request)
     {
         $request->validate([
-          'payment_intend_id' => 'required|string'
+          'payment_intent_id' => 'required|string'
         ]);
     
         $usuario = $request->user();
-        $intentoPagarId = $request->payment_intend_id;
+        $intentoPagarId = $request->payment_intent_id;
 
-        Stripe::setApIKey(env('STRIPE_SECRET'));
+        Stripe::setApiKey(env('STRIPE_SECRET'));
 
         return DB::transaction(function () use ($usuario, $intentoPagarId){
           try{
@@ -67,12 +68,12 @@ class OrdenController extends Controller
             if($intento->status !== 'succeeded') return response()->json(['mensaje' => 'El pago no se ha completado.'], 400);
 
           }catch(\Exception $e){
-             return response()->json(['error' => 'Error al conectar con Stripe'], 500);
+             return response()->json(['error' => 'Error al conectar con Stripe', 'mensaje' => $e->getMessage()], 500);
           }
 
           $carrito = Carrito::where('usuario_id', $usuario->id)->with('items.producto')->first();
 
-          if(!$carrito || $carrito->items()->isEmpty()) return response()->json(['mensaje' => 'No hay carrito para procesar.'], 400);
+          if(!$carrito || $carrito->items->isEmpty()) return response()->json(['mensaje' => 'No hay carrito para procesar.'], 400);
 
           $orden = Orden::create([
             'usuario_id' => $usuario->id,
@@ -81,7 +82,7 @@ class OrdenController extends Controller
           ]);
 
 
-          foreach($carrito->item() as $item){
+          foreach($carrito->items() as $item){
             $producto = Producto::lockForUpdate()->find($item->producto_id);
 
             if($producto->stock < $item->cantidad)  throw new \Exception("El producto {$producto->nombre} se agotó mientras pagabas.");
@@ -96,8 +97,6 @@ class OrdenController extends Controller
             $producto->stock -= $item->cantidad;
             $producto->save();
           }
-
-          $carrito->delete();
 
           return response()->json([
             'mensaje' => 'Compra realizada con éxito',
