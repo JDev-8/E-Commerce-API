@@ -2,56 +2,56 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Usuario;
 use App\Http\Requests\RegisterRequest;
 use App\Http\Requests\LoginRequest;
-use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Auth;
+use App\Services\AuthService;
+use Illuminate\Http\JsonResponse;
 
 class AuthController extends Controller
 {
-    public function register(RegisterRequest $request)
-    {
-      $usuario = Usuario::create($request->validated());
+  protected AuthService $authService;
 
-      $token = $usuario->createToken('auth_token')->plainTextToken;
+  public function __construct(AuthService $authService)
+  {
+    $this->authService = $authService;
+  }
 
-      return response()->json([
-        'message' => 'Usuario registrado exitosamente',
-        'access_token' => $token,
-        'token_type' => 'Bearer',
-        'usuario' => $usuario
-      ], 201);
+  public function register(RegisterRequest $request): JsonResponse
+  {
+    $result = $this->authService->register($request->validated());
+    return response()->json([
+      'message' => 'Usuario registrado exitosamente',
+      'access_token' => $result['access_token'],
+      'token_type' => $result['token_type'],
+      'usuario' => $result['usuario']
+    ], 201);
+  }
+
+  public function login(LoginRequest $request): JsonResponse
+  {
+    $credentials = [
+      'nombre_usuario' => $request->nombre_usuario,
+      'password' => $request->contrasenia
+    ];
+
+    $result = $this->authService->login($credentials);
+
+    if (!$result) {
+      return response()->json(['message' => 'Credenciales incorrectas'], 401);
     }
 
-    public function login(LoginRequest $request)
-    {
-      $credenciales = [
-        'nombre_usuario' => $request->nombre_usuario,
-        'password' => $request->contrasenia
-      ];
 
-      if(!Auth::attempt($credenciales)){
-        return response()->json(['message' => 'Credenciales incorrectas'],);
-      }
+    return response()->json([
+      'message' => 'Hola ' . $result['usuario']->nombres,
+      'access_token' => $result['access_token'],
+      'token_type' => $result['token_type'],
+      'user' => $result['usuario']
+    ]);
+  }
 
-      $usuario = Usuario::where('nombre_usuario', $request['nombre_usuario'])->firstOrFail();
-
-      $token = $usuario->createToken('auth_token')->plainTextToken;
-
-      return response()->json([
-        'message' => 'Hola ' . $usuario->nombres,
-        'access_token' => $token,
-        'token_type' => 'Bearer',
-        'user' => $usuario
-      ]);
-    }
-
-    public function logout()
-    {
-      if(auth()->user()){
-        auth()->user()->tokens()->delete();
-      }
-      return response()->json(['message' => 'Sesión cerrada exitosamente']);
-    }
+  public function logout(): JsonResponse
+  {
+    $this->authService->logout(auth()->user());
+    return response()->json(['message' => 'Sesión cerrada exitosamente']);
+  }
 }

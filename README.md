@@ -1,16 +1,22 @@
 # 🛒 API E-commerce Profesional
 
-API robusta y escalable para una plataforma de comercio electrónico, desarrollada con **Laravel** y **PostgreSQL**. Este proyecto implementa un flujo de compra completo, desde la gestión de inventario hasta el procesamiento de pagos reales con **Stripe**.
+API robusta y escalable para una plataforma de comercio electrónico, desarrollada con Laravel y PostgreSQL. Este proyecto implementa un flujo de compra completo, utilizando el **Patrón Service (Service Pattern)** para una arquitectura limpia, desde la gestión de inventario hasta el procesamiento de pagos reales con **Stripe**.
 
 ## 🚀 Características Principales
 
 - **Autenticación Segura**: Sistema de Login/Registro utilizando Laravel Sanctum (Tokens JWT).
+
+- **Arquitectura Limpia**: Implementación del patrón Service Repository para desacoplar la lógica de negocio de los controladores.
 
 - **Roles y Permisos**: Middleware personalizado para separar lógica de Clientes y Administradores.
 
 - **Gestión de Catálogo**: CRUD completo para Productos y Categorías con validación de datos.
 
 - **Carrito de Compras Persistente**: Lógica de negocio para manejar stock en tiempo real y persistencia en base de datos.
+
+- **Módulo de Envíos y Logística**: Seguimiento de estados de envío y autoguardado inteligente de direcciones de usuario.
+
+- **Sistema de Reseñas Verificadas**: Los usuarios pueden calificar productos (1-5 estrellas) solo si el sistema verifica una compra previa exitosa.
 
 - **Pasarela de Pagos (Stripe)**:
     - Generación de intentos de pago (Payment Intents).
@@ -29,33 +35,57 @@ API robusta y escalable para una plataforma de comercio electrónico, desarrolla
 
 - **Base de Datos**: PostgreSQL
 
-- **Pagos**: Stripe SDK
+- **Pagos**: Stripe PHP SDK
 
-- **Herramientas**: Insomnia/Postman, Composer, Git.
+- **Herramientas**: Insomnia, Composer, Git.
 
 ## 🗄️ Modelo de Base de Datos
 
 El sistema utiliza una arquitectura relacional normalizada.
 
 ```sql
-  USUARIOS {
-    bigint id
-    string nombre_usuario
-    string correo_electronico
-    string password
-    boolean is_admin
+  erDiagram
+    USUARIOS ||--o{ ORDENES : realiza
+    USUARIOS ||--o{ RESENAS : escribe
+    USUARIOS ||--o{ CARRITOS : posee
+    PRODUCTOS ||--o{ ORDEN_ITEMS : detalla
+    PRODUCTOS ||--o{ RESENAS : recibe
+    ORDENES ||--o{ ORDEN_ITEMS : contiene
+    ORDENES ||--|| PAGOS : genera
+    ORDENES ||--|| ENVIOS : tiene
+    CATEGORIAS ||--o{ PRODUCTOS : agrupa
+
+    USUARIOS {
+        bigint id PK
+        string nombre_usuario
+        string correo_electronico
+        boolean is_admin
+        string direccion
     }
     PRODUCTOS {
-        bigint id
+        bigint id PK
         string nombre
-        integer precio
+        integer precio "Centavos"
         integer stock
-        string slug
+        bigint categoria_id FK
     }
     ORDENES {
-        bigint id
-        string estado
-        integer pago_total
+        bigint id PK
+        string estado "pendiente, pagado, enviado, entregado"
+        decimal pago_total
+        bigint usuario_id FK
+    }
+    RESENAS {
+        bigint id PK
+        integer puntuacion "1-5"
+        text comentario
+        bigint producto_id FK
+    }
+    ENVIOS {
+        bigint id PK
+        string direccion_envio
+        boolean entregado
+        bigint orden_id FK
     }
 ```
 

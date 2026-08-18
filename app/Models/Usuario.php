@@ -9,33 +9,36 @@ use Illuminate\Notifications\Notifiable;
 
 class Usuario extends Authenticatable
 {
-    use HasApiTokens, HasFactory, Notifiable;
+  use HasApiTokens, HasFactory, Notifiable;
 
-    protected $table = 'usuarios';
+  protected $table = 'usuarios';
 
-    protected $fillable = [
-        'nombres',
-        'apellidos',
-        'cedula',
-        'correo_electronico',
-        'nombre_usuario',
-        'telefono',
-        'contrasenia',
-        'is_admin',
-    ];
+  protected $fillable = [
+    'nombres',
+    'apellidos',
+    'cedula',
+    'correo_electronico',
+    'nombre_usuario',
+    'telefono',
+    'contrasenia',
+    'is_admin',
+    'direccion',
+    'ciudad',
+    'codigo_postal'
+  ];
 
-    protected $hidden = [
-        'contrasenia',
-        'remember_token',
-    ];
+  protected $hidden = [
+    'contrasenia',
+    'remember_token',
+  ];
 
-    protected $casts = [
-        'is_admin' => 'boolean',
-        'email_verified_at' => 'datetime',
-    ];
+  protected $casts = [
+    'is_admin' => 'boolean',
+    'email_verified_at' => 'datetime',
+  ];
 
-    public function getAuthPassword()
-    {
-      return $this->contrasenia;
-    }
+  public function getAuthPassword()
+  {
+    return $this->contrasenia;
+  }
 }

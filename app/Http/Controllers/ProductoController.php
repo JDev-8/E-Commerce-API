@@ -2,71 +2,65 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Producto;
 use App\Http\Requests\ProductoRequest;
+use App\Services\ProductoService;
+use Illuminate\Http\JsonResponse;
 
 class ProductoController extends Controller
 {
-    public function index()
-    {
-      $productos = Producto::paginate(10);
-      return response()->json($productos);
+  protected ProductoService $productoService;
+
+  public function __construct(ProductoService $productoService)
+  {
+    $this->productoService = $productoService;
+  }
+
+  public function index(): JsonResponse
+  {
+    return response()->json($this->productoService->listar());
+  }
+
+  public function show($id): JsonResponse
+  {
+    $producto = $this->productoService->obtenerPorId($id);
+    if (!$producto) {
+      return response()->json(['mensaje' => 'Producto no encontrado'], 404);
     }
+    return response()->json($producto);
+  }
 
-    public function show($id)
-    {
-      $producto = Producto::find($id);
+  public function search($texto): JsonResponse
+  {
+    return response()->json($this->productoService->buscarPorNombre($texto));
+  }
 
-      if(!$producto){
-        return response()->json(['mensaje' => 'Producto no encontrado'], 404);
-      }
+  public function store(ProductoRequest $request): JsonResponse
+  {
+    $producto = $this->productoService->crear($request->validated());
+    return response()->json([
+      'mensaje' => 'Producto creado con éxito.',
+      'producto' => $producto
+    ], 201);
+  }
 
-      return response()->json($producto);
+  public function update(ProductoRequest $request, $id): JsonResponse
+  {
+    $producto = $this->productoService->actualizar($id, $request->validated());
+    if (!$producto) {
+      return response()->json(['mensaje' => 'Producto no encontrado'], 404);
     }
+    return response()->json([
+      'mensaje' => 'Producto actualizado',
+      'producto' => $producto
+    ], 201);
+  }
 
-    public function search($texto){
-      $productos = Producto::where('nombre', 'like', '%'. $texto . '%')->get();
-      return response()->json($productos);
+  public function destroy($id): JsonResponse
+  {
+    $eliminado = $this->productoService->eliminar($id);
+    if (!$eliminado) {
+      return response()->json(['mensaje' => 'Producto no encontrado.'], 404);
     }
-
-    public function store(ProductoRequest $request)
-    {
-      $producto = Producto::create($request->validate());
-
-      return response()->json([
-        'mensaje' => 'Producto creado con éxito.',
-        'producto' => $producto
-      ], 201);
-    }
-
-    public function update(ProductoRequest $request, $id)
-    {
-      $producto = Producto::find($id);
-
-      if(!$producto){
-        return response()->json(['mensaje' => 'Producto no encontrado'], 404);
-      }
-
-      $producto->update($request->validate());
-
-      return response()->json([
-        'mensaje' => 'Producto actualizado',
-        'producto' => $producto
-      ], 201);
-    }
-
-    public function destroy($id)
-    {
-      $producto = Producto::find($id);
-
-      if(!$producto){
-        return response()->json(['mensaje' => 'Producto no encontrado.'], 404);
-      }
-
-      $producto->delete();
-
-      return response()->json([
-        'mensaje' => 'Producto eliminado con éxtio.'
-      ]);
-    }
+    return response()->json(['mensaje' => 'Producto eliminado con éxito.']);
+  }
 }
