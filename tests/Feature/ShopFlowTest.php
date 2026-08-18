@@ -11,71 +11,77 @@ use Laravel\Sanctum\Sanctum;
 
 class ShopFlowTest extends TestCase
 {
-    use RefreshDatabase;
+  use RefreshDatabase;
 
-    public function test_usuario_puede_agregar_items_al_carrito()
-    {
-        $categoria = Categoria::create(['categoria' => 'Electrónica']);
-        
-        $producto = Producto::create([
-            'nombre' => 'iPhone 15',
-            'stock' => 10,
-            'precio' => 100000, 
-            'categoria_id' => $categoria->id,
-            'slug' => 'iphone-15'
-        ]);
+  public function test_usuario_puede_agregar_items_al_carrito()
+  {
+    $categoria = Categoria::create(['categoria' => 'Electrónica']);
 
-        $cliente = Usuario::create([
-            'nombres' => 'Cliente', 'apellidos' => 'Feliz', 
-            'cedula' => '999', 'nombre_usuario' => 'cliente', 
-            'correo_electronico' => 'cliente@shop.com', 'telefono' => '555', 
-            'contrasenia' => bcrypt('password'), 
-            'is_admin' => false
-        ]);
+    $producto = Producto::create([
+      'nombre' => 'iPhone 15',
+      'stock' => 10,
+      'precio' => 100000,
+      'categoria_id' => $categoria->id,
+      'slug' => 'iphone-15'
+    ]);
 
-        Sanctum::actingAs($cliente, ['*']);
+    $cliente = Usuario::create([
+      'nombres' => 'Cliente',
+      'apellidos' => 'Feliz',
+      'cedula' => '999',
+      'nombre_usuario' => 'cliente',
+      'correo_electronico' => 'cliente@shop.com',
+      'telefono' => '555',
+      'contrasenia' => bcrypt('password'),
+      'is_admin' => false
+    ]);
 
-        $response = $this->postJson('/api/carrito', [
-            'producto_id' => $producto->id,
-            'cantidad' => 2
-        ]);
+    Sanctum::actingAs($cliente, ['*']);
 
-        $response->assertStatus(200)
-                 ->assertJson(['mensaje' => 'Producto agregado al carrito']);
+    $response = $this->postJson('/api/carrito', [
+      'producto_id' => $producto->id,
+      'cantidad' => 2
+    ]);
 
-        $this->assertDatabaseHas('carrito_items', [
-            'producto_id' => $producto->id,
-            'cantidad' => 2
-        ]);
-    }
+    $response->assertStatus(200)
+      ->assertJson(['mensaje' => 'Producto agregado al carrito']);
 
-    public function test_no_puede_agregar_mas_del_stock_disponible()
-    {
-        $categoria = Categoria::create(['categoria' => 'Ropa']);
-        $producto = Producto::create([
-            'nombre' => 'Camisa Limitada',
-            'stock' => 5,
-            'precio' => 2000,
-            'categoria_id' => $categoria->id,
-            'slug' => 'camisa-limitada'
-        ]);
+    $this->assertDatabaseHas('carrito_items', [
+      'producto_id' => $producto->id,
+      'cantidad' => 2
+    ]);
+  }
 
-        $cliente = Usuario::create([
-            'nombres' => 'Comprador', 'apellidos' => 'Compulsivo', 
-            'cedula' => '888', 'nombre_usuario' => 'buyer', 
-            'correo_electronico' => 'buyer@shop.com', 'telefono' => '444', 
-            'contrasenia' => bcrypt('password'),
-            'is_admin' => false
-        ]);
+  public function test_no_puede_agregar_mas_del_stock_disponible()
+  {
+    $categoria = Categoria::create(['categoria' => 'Ropa']);
+    $producto = Producto::create([
+      'nombre' => 'Camisa Limitada',
+      'stock' => 5,
+      'precio' => 2000,
+      'categoria_id' => $categoria->id,
+      'slug' => 'camisa-limitada'
+    ]);
 
-        Sanctum::actingAs($cliente, ['*']);
+    $cliente = Usuario::create([
+      'nombres' => 'Comprador',
+      'apellidos' => 'Compulsivo',
+      'cedula' => '888',
+      'nombre_usuario' => 'buyer',
+      'correo_electronico' => 'buyer@shop.com',
+      'telefono' => '444',
+      'contrasenia' => bcrypt('password'),
+      'is_admin' => false
+    ]);
 
-        $response = $this->postJson('/api/carrito', [
-            'producto_id' => $producto->id,
-            'cantidad' => 10 
-        ]);
+    Sanctum::actingAs($cliente, ['*']);
 
-        $response->assertStatus(400)
-                 ->assertJson(['mensaje' => 'No hay suficiente stock disponible.']);
-    }
+    $response = $this->postJson('/api/carrito', [
+      'producto_id' => $producto->id,
+      'cantidad' => 10
+    ]);
+
+    $response->assertStatus(400)
+      ->assertJson(['mensaje' => 'No hay suficiente stock disponible']);
+  }
 }
